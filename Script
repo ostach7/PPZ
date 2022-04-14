@@ -21,10 +21,13 @@
     $windowsClientBasicDriveInitPath=$scriptPath+"\windowsClientBasicDrive.vhdx"
     Move-Item -Path $windowsServerBasicDriveInitPath -Destination $BasicDrives
     Move-Item -Path $windowsClientBasicDriveInitPath -Destination $BasicDrives
+    $windowsServerBasicDrivePath=$BasicDrives+"\windowsServerBasicDrive.vhdx"
+    $windowsClientBasicDrivePath=$BasicDrives+"\windowsClientBasicDrive.vhdx"
 #Tworzenie maszyn wirtualnych
     $VMcount=3
     $VMname="VM"
     for($i=1;$i -le $VMcount;$i++){
-        #tu wstawic komende do tworzenia (#mati przerobi)
+        new-vm -Name $VMname+$i -Path $VMLocalisation -VHDPath $windowsServerBasicDrivePath
     }
+    new-vm -Name $VMname+"Server" -Path $VMLocalisation -VHDPath $windowsClientBasicDrivePath
        
