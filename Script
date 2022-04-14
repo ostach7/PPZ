@@ -2,7 +2,7 @@
     $ProjectLocalisation="c:\AutoScriptResult"
     $DrivesLocalisation=$ProjectLocalisation+"\Drives"
     $VMLocalisation=$ProjectLocalisation+"\VM"
-    $BasicDrives=$DrivesLocalisation="\BasicDrives"
+    $BasicDrives=$DrivesLocalisation+"\BasicDrives"
     New-Item -Path $ProjectLocalisation -ItemType Directory
     New-Item -Path $DrivesLocalisation -ItemType Directory
     New-Item -Path $BasicDrives -ItemType Directory
@@ -15,7 +15,10 @@
         Write-Host "Utworzono folder do przechowywania danych $scriptTranscript" -ForegroundColor Green
     }
     Start-Transcript $scriptTranscript
-#Tworzenie dysków    
-    $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
-    $windowsServerBasicDriveInitPath=$scriptPath+"\windowsServerBasicDrive.vhdx"
-    $windowsClientBasicDriveInitPath=$scriptPath+"\windowsClientBasicDrive.vhdx"
+#Tworzenie dysków 
+    #Przenoszenie dysków podstawowych z folderu skryptu do docelowej lokalizacji
+        $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
+        $windowsServerBasicDriveInitPath=$scriptPath+"\windowsServerBasicDrive.vhdx"
+        $windowsClientBasicDriveInitPath=$scriptPath+"\windowsClientBasicDrive.vhdx"
+        Move-Item -Path $windowsServerBasicDriveInitPath -Destination $BasicDrives
+        Move-Item -Path $windowsClientBasicDriveInitPath -Destination $BasicDrives
