@@ -21,3 +21,7 @@
         $windowsClientBasicDriveInitPath=$scriptPath+"\windowsClientBasicDrive.vhdx"
         Move-Item -Path $windowsServerBasicDriveInitPath -Destination $BasicDrives
         Move-Item -Path $windowsClientBasicDriveInitPath -Destination $BasicDrives
+        
+        new-vhd -path D:\CHMURA\ADS\hyper-v\dyski\win10.vhdx -SizeBytes 30GB -Dynamic 
+        new-vm -Name TemplateVm2 -Path D:\CHMURA\ADS\hyper-v\maszyny -VHDPath D:\CHMURA\ADS\hyper-v\dyski\win10.vhdx
+        add-vmdvddrive -VMName TemplateVM2 -Path D:\CHMURA\ADS\windowsy\win10.iso
