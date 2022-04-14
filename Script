@@ -17,5 +17,5 @@
     Start-Transcript $scriptTranscript
 #Tworzenie dysków    
     $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
-    $windowsServerISOPath=$scriptPath+"\windowsServer.iso"
-    $windowsClientISOPath=$scriptPath+"\windowsClient.iso"
+    $windowsServerBasicDriveInitPath=$scriptPath+"\windowsServerBasicDrive.vhdx"
+    $windowsClientBasicDriveInitPath=$scriptPath+"\windowsClientBasicDrive.vhdx"
