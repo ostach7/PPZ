@@ -1,0 +1,19 @@
+#Tworzenie lokalizacji projektu
+
+$ProjectLocalisation="c:\AutoScriptResult"
+$DrivesLocalisation=$ProjectLocalisation+"\drives"
+$VMLocalisation=$ProjectLocalisation+"\VM"
+New-Item -Path $ProjectLocalisation -ItemType Directory
+New-Item -Path $DrivesLocalisation -ItemType Directory
+New-Item -Path $VMLocalisation -ItemType Directory
+
+#Tworzenie transkryptu projektu
+
+$scriptTranscript=$ProjectLocalisation+"\log"
+if(Test-Path -Path $scriptTranscript){
+    Write-Host "Istnieje lokalizacja $scriptTranscript" -ForegroundColor Red
+}else{
+    Write-Host "Utworzono folder do przechowywania danych $scriptTranscript" -ForegroundColor Green
+}
+Start-Transcript $scriptTranscript
+
