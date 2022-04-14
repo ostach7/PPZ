@@ -15,8 +15,7 @@
         Write-Host "Utworzono folder do przechowywania danych $scriptTranscript" -ForegroundColor Green
     }
     Start-Transcript $scriptTranscript
-#Tworzenie dysków 
-    #Przenoszenie dysków podstawowych z folderu skryptu do docelowej lokalizacji
+#Przenoszenie dysków podstawowych z folderu skryptu do docelowej lokalizacji
         $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
         $windowsServerBasicDriveInitPath=$scriptPath+"\windowsServerBasicDrive.vhdx"
         $windowsClientBasicDriveInitPath=$scriptPath+"\windowsClientBasicDrive.vhdx"
