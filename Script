@@ -16,8 +16,15 @@
     }
     Start-Transcript $scriptTranscript
 #Przenoszenie dysków podstawowych z folderu skryptu do docelowej lokalizacji
-        $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
-        $windowsServerBasicDriveInitPath=$scriptPath+"\windowsServerBasicDrive.vhdx"
-        $windowsClientBasicDriveInitPath=$scriptPath+"\windowsClientBasicDrive.vhdx"
-        Move-Item -Path $windowsServerBasicDriveInitPath -Destination $BasicDrives
-        Move-Item -Path $windowsClientBasicDriveInitPath -Destination $BasicDrives
+    $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
+    $windowsServerBasicDriveInitPath=$scriptPath+"\windowsServerBasicDrive.vhdx"
+    $windowsClientBasicDriveInitPath=$scriptPath+"\windowsClientBasicDrive.vhdx"
+    Move-Item -Path $windowsServerBasicDriveInitPath -Destination $BasicDrives
+    Move-Item -Path $windowsClientBasicDriveInitPath -Destination $BasicDrives
+#Tworzenie maszyn wirtualnych
+    $VMcount=3
+    $VMname="VM"
+    for($i=1;$i -le $VMcount;$i++){
+        #tu wstawic komende do tworzenia (#mati przerobi)
+    }
+       
