@@ -27,7 +27,7 @@
     $VMcount=3
     $VMname="VM"
     for($i=1;$i -le $VMcount;$i++){
-        new-vm -Name $VMname+$i -Path $VMLocalisation -VHDPath $windowsServerBasicDrivePath
+        new-vm -Name $VMname+$i -Path $VMLocalisation -VHDPath $windowsClientBasicDrivePath
     }
-    new-vm -Name $VMname+"Server" -Path $VMLocalisation -VHDPath $windowsClientBasicDrivePath
+    new-vm -Name $VMname+"Server" -Path $VMLocalisation -VHDPath $windowsServerBasicDrivePath
        
