@@ -1,9 +1,11 @@
 #Tworzenie lokalizacji projektu
     $ProjectLocalisation="c:\AutoScriptResult"
-    $DrivesLocalisation=$ProjectLocalisation+"\drives"
+    $DrivesLocalisation=$ProjectLocalisation+"\Drives"
     $VMLocalisation=$ProjectLocalisation+"\VM"
+    $BasicDrives=$DrivesLocalisation="\BasicDrives"
     New-Item -Path $ProjectLocalisation -ItemType Directory
     New-Item -Path $DrivesLocalisation -ItemType Directory
+    New-Item -Path $BasicDrives -ItemType Directory
     New-Item -Path $VMLocalisation -ItemType Directory
 #Tworzenie transkryptu projektu
     $scriptTranscript=$ProjectLocalisation+"\log"
@@ -14,4 +16,3 @@
     }
     Start-Transcript $scriptTranscript
 #Tworzenie dysków    
-#test
