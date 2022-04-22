@@ -27,27 +27,27 @@
     $VMcount=3
     $VMname="VM"
     for($i=1;$i -le $VMcount;$i++){
-        New-VHD -ParentPath $windowsClientBasicDrivePath -Path $DrivesLocalisation"VM"$i"DiffDrive.vhdx" -Differencing
-        new-vm -Name $VMname$i -Path $VMLocalisation -VHDPath $DrivesLocalisation"VM"$i"DiffDrive.vhdx"
+        New-VHD -ParentPath $windowsClientBasicDrivePath -Path ($DrivesLocalisation="\VM$iDiffDrive.vhdx") -Differencing
+        new-vm -Name ($VMname+$i) -Path $VMLocalisation -VHDPath ($DrivesLocalisation+"\VM$iDiffDrive.vhdx")
     }
-    New-VHD -ParentPath $windowsServerBasicDrivePath -Path $DrivesLocalisation"\ServerDiffDrive.vhdx" -Differencing
-    new-vm -Name $VMname"Server" -Path $VMLocalisation -VHDPath "$DrivesLocalisation\ServerDiffDrive.vhdx"
+    New-VHD -ParentPath $windowsServerBasicDrivePath -Path ($DrivesLocalisation+"\ServerDiffDrive.vhdx") -Differencing
+    new-vm -Name ($VMname+"Server") -Path $VMLocalisation -VHDPath ($DrivesLocalisation+"\ServerDiffDrive.vhdx")
 #Konfiguracja serwera
-    Start-VM -Name $VMname"Server"
-    Enter-PSSession -VMName $VMname"Server"
-    Rename-Computer -NewName $VMname"Server"
+    Start-VM -Name ($VMname+"Server")
+    Enter-PSSession -VMName ($VMname+"Server")
+    Rename-Computer -NewName ($VMname+"Server")
     Set-NetIPAddress -InterfaceIndex 12 -IPAddress 10.10.10.1 -PrefixLength 24
     
     Exit-PSSession
-    Stop-VM -Name $VMname"Server"
+    Stop-VM -Name ($VMname+"Server")
 #Konfiguracja maszyn klienckich
-    #VMIpAddress="10.10.10.2"
+    $VMIpAddress="10.10.10.2"
     for($i=1;$i -le $VMcount;$i++){
-        Start-VM -Name $VMname$i
-        Enter-PSSession -VMName $VMname$i
-        Rename-Computer -NewName $VMname$i
-        Set-NetIPAddress -InterfaceIndex 12 -IPAddress #VMIpAddress$i -PrefixLength 24
+        Start-VM -Name ($VMname+$i)
+        Enter-PSSession -VMName ($VMname+$i)
+        Rename-Computer -NewName ($VMname+$i)
+        Set-NetIPAddress -InterfaceIndex 12 -IPAddress ($VMIpAddress+$i) -PrefixLength 24
     
         Exit-PSSession
-        Stop-VM -Name $VMname$i
+        Stop-VM -Name ($VMname+$i)
     }
