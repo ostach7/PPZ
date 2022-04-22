@@ -32,4 +32,8 @@
     }
     New-VHD -ParentPath $windowsServerBasicDrivePath -Path $DrivesLocalisation+"ServerDiffDrive.vhdx" -Differencing
     new-vm -Name $VMname+"Server" -Path $VMLocalisation -VHDPath $DrivesLocalisation+"ServerDiffDrive.vhdx"
-       
+#Konfiguracja serwera
+    Start-VM -Name $VMname+"Server"
+    Enter-PSSession -VMName $VMname+"Server"
+    
+    Exit-PSSession
