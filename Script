@@ -35,5 +35,19 @@
 #Konfiguracja serwera
     Start-VM -Name $VMname+"Server"
     Enter-PSSession -VMName $VMname+"Server"
+    Rename-Computer -NewName $VMname+"Server"
+    Set-NetIPAddress -InterfaceIndex 12 -IPAddress 10.10.10.1 -PrefixLength 24
     
     Exit-PSSession
+    Stop-VM -Name $VMname+"Server"
+#Konfiguracja maszyn klienckich
+    #VMIpAddress="10.10.10.2"
+    for($i=1;$i -le $VMcount;$i++){
+        Start-VM -Name $VMname+$i
+        Enter-PSSession -VMName $VMname+$i
+        Rename-Computer -NewName $VMname+$i
+        Set-NetIPAddress -InterfaceIndex 12 -IPAddress #VMIpAddress+$i -PrefixLength 24
+    
+        Exit-PSSession
+        Stop-VM -Name $VMname+$i
+    }
