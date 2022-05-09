@@ -36,19 +36,19 @@
     $passwordServer = ConvertTo-SecureString "zaq1@WSX" -AsPlainText -Force
     $credServer= New-Object System.Management.Automation.PSCredential ("Administrator", $password )
     Start-VM -Name ($VMname+"Server")
-    Enter-PSSession -VMName ($VMname+"Server") -RunAsAdministrator
+    Enter-PSSession -VMName ($VMname+"Server") -Credential $credServer
     Rename-Computer -NewName ($VMname+"Server")
     Set-NetIPAddress -InterfaceIndex 12 -IPAddress 10.10.10.1 -PrefixLength 24
     
     Exit-PSSession
     Stop-VM -Name ($VMname+"Server")
 #Konfiguracja maszyn klienckich
-    $passwordServer = ConvertTo-SecureString "zaq1@WSX" -AsPlainText -Force
-    $credServer= New-Object System.Management.Automation.PSCredential ("user", $password )
+    $passwordUser = ConvertTo-SecureString "zaq1@WSX" -AsPlainText -Force
+    $credUser= New-Object System.Management.Automation.PSCredential ("user", $password )
     $VMIpAddress="10.10.10.2"
     for($i=1;$i -le $VMcount;$i++){
         Start-VM -Name ($VMname+$i)
-        Enter-PSSession -VMName ($VMname+$i) -RunAsAdministrator
+        Enter-PSSession -VMName ($VMname+$i) -Credential $credUser
         Rename-Computer -NewName ($VMname+$i)
         Set-NetIPAddress -InterfaceIndex 12 -IPAddress ($VMIpAddress+$i) -PrefixLength 24
     
