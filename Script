@@ -35,6 +35,7 @@
 #Konfiguracja serwera
     $passwordServer = ConvertTo-SecureString "zaq1@WSX" -AsPlainText -Force
     $credServer= New-Object System.Management.Automation.PSCredential ("Administrator", $password )
+    Get-VM -Name ($VMname+"Server") | Get-VMNetworkAdapter | Connect-VMNetworkAdapter -SwitchName "Default Switch"
     Start-VM -Name ($VMname+"Server")
     Enter-PSSession -VMName ($VMname+"Server") -Credential $credServer
     Rename-Computer -NewName ($VMname+"Server")
@@ -49,6 +50,7 @@
     $credUser= New-Object System.Management.Automation.PSCredential ("user", $password )
     $VMIpAddress="10.10.10.2"
     for($i=1;$i -le $VMcount;$i++){
+        Get-VM -Name ($VMname+$i) | Get-VMNetworkAdapter | Connect-VMNetworkAdapter -SwitchName "Default Switch"
         Start-VM -Name ($VMname+$i)
         Enter-PSSession -VMName ($VMname+$i) -Credential $credUser
         Rename-Computer -NewName ($VMname+$i)
