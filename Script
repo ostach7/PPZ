@@ -40,6 +40,7 @@
     Rename-Computer -NewName ($VMname+"Server")
     Remove-NetIPAddress -Confirm True
     New-NetIPAddress -InterfaceIndex 7 -IPAddress 10.10.10.1 -PrefixLength 24
+    Set-DnsClientServerAddress -InterfaceIndex 7 -ServerAddresses ("10.10.10.1")
     
     Exit-PSSession
     Stop-VM -Name ($VMname+"Server")
