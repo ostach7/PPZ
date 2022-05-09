@@ -38,7 +38,8 @@
     Start-VM -Name ($VMname+"Server")
     Enter-PSSession -VMName ($VMname+"Server") -Credential $credServer
     Rename-Computer -NewName ($VMname+"Server")
-    Set-NetIPAddress -InterfaceIndex 12 -IPAddress 10.10.10.1 -PrefixLength 24
+    Remove-NetIPAddress -Confirm True
+    New-NetIPAddress -InterfaceIndex 7 -IPAddress 10.10.10.1 -PrefixLength 24
     
     Exit-PSSession
     Stop-VM -Name ($VMname+"Server")
@@ -50,7 +51,8 @@
         Start-VM -Name ($VMname+$i)
         Enter-PSSession -VMName ($VMname+$i) -Credential $credUser
         Rename-Computer -NewName ($VMname+$i)
-        Set-NetIPAddress -InterfaceIndex 12 -IPAddress ($VMIpAddress+$i) -PrefixLength 24
+        Remove-NetIPAddress -Confirm True
+        New-NetIPAddress -InterfaceIndex 7 -IPAddress ($VMIpAddress+$i) -PrefixLength 24
     
         Exit-PSSession
         Stop-VM -Name ($VMname+$i)
