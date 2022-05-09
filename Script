@@ -33,6 +33,8 @@
     New-VHD -ParentPath $windowsServerBasicDrivePath -Path ($DrivesLocalisation+"\ServerDiffDrive.vhdx") -Differencing
     new-vm -Name ($VMname+"Server") -Path $VMLocalisation -VHDPath ($DrivesLocalisation+"\ServerDiffDrive.vhdx")
 #Konfiguracja serwera
+    $passwordServer = ConvertTo-SecureString "zaq1@WSX" -AsPlainText -Force
+    $credServer= New-Object System.Management.Automation.PSCredential ("Administrator", $password )
     Start-VM -Name ($VMname+"Server")
     Enter-PSSession -VMName ($VMname+"Server") -RunAsAdministrator
     Rename-Computer -NewName ($VMname+"Server")
@@ -41,6 +43,8 @@
     Exit-PSSession
     Stop-VM -Name ($VMname+"Server")
 #Konfiguracja maszyn klienckich
+    $passwordServer = ConvertTo-SecureString "zaq1@WSX" -AsPlainText -Force
+    $credServer= New-Object System.Management.Automation.PSCredential ("user", $password )
     $VMIpAddress="10.10.10.2"
     for($i=1;$i -le $VMcount;$i++){
         Start-VM -Name ($VMname+$i)
