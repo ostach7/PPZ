@@ -50,6 +50,25 @@
     New-ADOrganizationalUnit -Name "IT" -Path "DC=$domainName.ToUpper(),DC=LOCAL"
     New-ADOrganizationalUnit -Name "Logistic" -Path "DC=$domainName.ToUpper(),DC=LOCAL"
     
+#Tworzenie użytkowników na serwerze początek
+    $usrs = Import-Csv ($ProjectLocalisation+"\users")
+ForEach ($us in $usrs){ 
+    $usDs = $us.Imie + " " + $us.Nazwisko 
+    $usGiven = $us.'Imie' 
+    $usSurname = $us.'Nazwisko' 
+    $usDSN = $us.'Lokalizacja' 
+    $usDep = $us.'Dzial' 
+    $usLog = $us.'Login' 
+    $usEmail = $us.'Email' 
+    $passec = $us.'Haslo' 
+    $pathU = "$usDSN" + "," + "$domainDN" 
+    $passC = ConvertTo-SecureString "$passec" -AsPlainText -Force 
+    New-ADUser -DisplayName: $usDs -Name: $usDs -Path: $pathU -GivenName:"$usGiven" -Surname:"$usSurname" -Department: "$usDep" -SamAccountName:$usLog -UserPrincipalName: "$usLog@$domainForest" -Type:"user" -EmailAddress "$usEmail" -Enabled $true -AccountPassword $passC 
+
+}
+#Tworzenie użytkowników na serwerze koniec
+   
+    
     Exit-PSSession
     Stop-VM -Name ($VMname+"Server")
 #Konfiguracja maszyn klienckich
