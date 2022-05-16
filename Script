@@ -16,6 +16,7 @@
     }
     Start-Transcript $scriptTranscript
 #Przenoszenie dysków podstawowych z folderu skryptu do docelowej lokalizacji
+
         $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
         $windowsServerBasicDriveInitPath=$scriptPath+"\windowsServerBasicDrive.vhdx"
         $windowsClientBasicDriveInitPath=$scriptPath+"\windowsClientBasicDrive.vhdx"
@@ -25,3 +26,73 @@
         new-vhd -path D:\CHMURA\ADS\hyper-v\dyski\win10.vhdx -SizeBytes 30GB -Dynamic 
         new-vm -Name TemplateVm2 -Path D:\CHMURA\ADS\hyper-v\maszyny -VHDPath D:\CHMURA\ADS\hyper-v\dyski\win10.vhdx
         add-vmdvddrive -VMName TemplateVM2 -Path D:\CHMURA\ADS\windowsy\win10.iso
+    $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
+    $windowsServerBasicDriveInitPath=$scriptPath+"\windowsServerBasicDrive.vhdx"
+    $windowsClientBasicDriveInitPath=$scriptPath+"\windowsClientBasicDrive.vhdx"
+    Move-Item -Path $windowsServerBasicDriveInitPath -Destination $BasicDrives
+    Move-Item -Path $windowsClientBasicDriveInitPath -Destination $BasicDrives
+    $windowsServerBasicDrivePath=$BasicDrives+"\windowsServerBasicDrive.vhdx"
+    $windowsClientBasicDrivePath=$BasicDrives+"\windowsClientBasicDrive.vhdx"
+#Tworzenie maszyn wirtualnych
+    $VMcount=3
+    $VMname="VM"
+    for($i=1;$i -le $VMcount;$i++){
+        New-VHD -ParentPath $windowsClientBasicDrivePath -Path ($DrivesLocalisation="\VM$iDiffDrive.vhdx") -Differencing
+        new-vm -Name ($VMname+$i) -Path $VMLocalisation -VHDPath ($DrivesLocalisation+"\VM$iDiffDrive.vhdx")
+    }
+    New-VHD -ParentPath $windowsServerBasicDrivePath -Path ($DrivesLocalisation+"\ServerDiffDrive.vhdx") -Differencing
+    new-vm -Name ($VMname+"Server") -Path $VMLocalisation -VHDPath ($DrivesLocalisation+"\ServerDiffDrive.vhdx")
+#Konfiguracja serwera
+    $domainName="ocean"
+    $passwordServer = ConvertTo-SecureString "zaq1@WSX" -AsPlainText -Force
+    $credServer= New-Object System.Management.Automation.PSCredential ("Administrator", $password )
+    Get-VM -Name ($VMname+"Server") | Get-VMNetworkAdapter | Connect-VMNetworkAdapter -SwitchName "Default Switch"
+    Start-VM -Name ($VMname+"Server")
+    Enter-PSSession -VMName ($VMname+"Server") -Credential $credServer
+    Rename-Computer -NewName ($VMname+"Server")
+    Remove-NetIPAddress -Confirm True
+    New-NetIPAddress -InterfaceIndex 7 -IPAddress 10.10.10.1 -PrefixLength 24
+    Set-DnsClientServerAddress -InterfaceIndex 7 -ServerAddresses ("10.10.10.1")
+    Install-windowsfeature AD-domain-services
+    Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+    Install-ADDSDomainController -InstallDns -Credential (Get-Credential $domainName\administrator) -DomainName ($domainName+".local") -SafeModeAdministratorPassword (ConvertTo-SecureString -AsPlainText $passwordServer -Force)
+    New-ADOrganizationalUnit -Name "Management" -Path "DC=$domainName.ToUpper(),DC=LOCAL"
+    New-ADOrganizationalUnit -Name "IT" -Path "DC=$domainName.ToUpper(),DC=LOCAL"
+    New-ADOrganizationalUnit -Name "Logistic" -Path "DC=$domainName.ToUpper(),DC=LOCAL"
+    
+#Tworzenie użytkowników na serwerze początek
+    $usrs = Import-Csv ($ProjectLocalisation+"\users")
+ForEach ($us in $usrs){ 
+    $usDs = $us.Imie + " " + $us.Nazwisko 
+    $usGiven = $us.'Imie' 
+    $usSurname = $us.'Nazwisko' 
+    $usDSN = $us.'Lokalizacja' 
+    $usDep = $us.'Dzial' 
+    $usLog = $us.'Login' 
+    $usEmail = $us.'Email' 
+    $passec = $us.'Haslo' 
+    $pathU = "$usDSN" + "," + "$domainDN" 
+    $passC = ConvertTo-SecureString "$passec" -AsPlainText -Force 
+    New-ADUser -DisplayName: $usDs -Name: $usDs -Path: $pathU -GivenName:"$usGiven" -Surname:"$usSurname" -Department: "$usDep" -SamAccountName:$usLog -UserPrincipalName: "$usLog@$domainForest" -Type:"user" -EmailAddress "$usEmail" -Enabled $true -AccountPassword $passC 
+
+}
+#Tworzenie użytkowników na serwerze koniec
+   
+    
+    Exit-PSSession
+    Stop-VM -Name ($VMname+"Server")
+#Konfiguracja maszyn klienckich
+    $passwordUser = ConvertTo-SecureString "zaq1@WSX" -AsPlainText -Force
+    $credUser= New-Object System.Management.Automation.PSCredential ("user", $password )
+    $VMIpAddress="10.10.10.2"
+    for($i=1;$i -le $VMcount;$i++){
+        Get-VM -Name ($VMname+$i) | Get-VMNetworkAdapter | Connect-VMNetworkAdapter -SwitchName "Default Switch"
+        Start-VM -Name ($VMname+$i)
+        Enter-PSSession -VMName ($VMname+$i) -Credential $credUser
+        Rename-Computer -NewName ($VMname+$i)
+        Remove-NetIPAddress -Confirm True
+        New-NetIPAddress -InterfaceIndex 7 -IPAddress ($VMIpAddress+$i) -PrefixLength 24
+    
+        Exit-PSSession
+        Stop-VM -Name ($VMname+$i)
+    }
