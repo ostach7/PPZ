@@ -46,6 +46,9 @@
     Install-windowsfeature AD-domain-services
     Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
     Install-ADDSDomainController -InstallDns -Credential (Get-Credential $domainName\administrator) -DomainName ($domainName+".local") -SafeModeAdministratorPassword (ConvertTo-SecureString -AsPlainText $passwordServer -Force)
+    New-ADOrganizationalUnit -Name "Management" -Path "DC=$domainName.ToUpper(),DC=LOCAL"
+    New-ADOrganizationalUnit -Name "IT" -Path "DC=$domainName.ToUpper(),DC=LOCAL"
+    New-ADOrganizationalUnit -Name "Logistic" -Path "DC=$domainName.ToUpper(),DC=LOCAL"
     
     Exit-PSSession
     Stop-VM -Name ($VMname+"Server")
