@@ -33,6 +33,7 @@
     New-VHD -ParentPath $windowsServerBasicDrivePath -Path ($DrivesLocalisation+"\ServerDiffDrive.vhdx") -Differencing
     new-vm -Name ($VMname+"Server") -Path $VMLocalisation -VHDPath ($DrivesLocalisation+"\ServerDiffDrive.vhdx")
 #Konfiguracja serwera
+    $domainName="ocean.local"
     $passwordServer = ConvertTo-SecureString "zaq1@WSX" -AsPlainText -Force
     $credServer= New-Object System.Management.Automation.PSCredential ("Administrator", $password )
     Get-VM -Name ($VMname+"Server") | Get-VMNetworkAdapter | Connect-VMNetworkAdapter -SwitchName "Default Switch"
@@ -42,6 +43,9 @@
     Remove-NetIPAddress -Confirm True
     New-NetIPAddress -InterfaceIndex 7 -IPAddress 10.10.10.1 -PrefixLength 24
     Set-DnsClientServerAddress -InterfaceIndex 7 -ServerAddresses ("10.10.10.1")
+    Install-windowsfeature AD-domain-services
+    Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+    Install-ADDSDomainController -InstallDns -Credential (Get-Credential $domainName\administrator) -DomainName $domainName -SafeModeAdministratorPassword (ConvertTo-SecureString -AsPlainText $passwordServer -Force)
     
     Exit-PSSession
     Stop-VM -Name ($VMname+"Server")
