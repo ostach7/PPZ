@@ -51,19 +51,43 @@
     New-ADOrganizationalUnit -Name "Logistic" -Path "DC=$domainName.ToUpper(),DC=LOCAL"
     
 #Tworzenie użytkowników na serwerze początek
-    $usrs = Import-Csv ($ProjectLocalisation+"\users")
-ForEach ($us in $usrs){ 
-    $usDs = $us.Imie + " " + $us.Nazwisko 
-    $usGiven = $us.'Imie' 
-    $usSurname = $us.'Nazwisko' 
-    $usDSN = $us.'Lokalizacja' 
-    $usDep = $us.'Dzial' 
-    $usLog = $us.'Login' 
-    $usEmail = $us.'Email' 
-    $passec = $us.'Haslo' 
-    $pathU = "$usDSN" + "," + "$domainDN" 
-    $passC = ConvertTo-SecureString "$passec" -AsPlainText -Force 
-    New-ADUser -DisplayName: $usDs -Name: $usDs -Path: $pathU -GivenName:"$usGiven" -Surname:"$usSurname" -Department: "$usDep" -SamAccountName:$usLog -UserPrincipalName: "$usLog@$domainForest" -Type:"user" -EmailAddress "$usEmail" -Enabled $true -AccountPassword $passC 
+$users = ($ProjectLocalisation+"\users.csv")
+
+foreach ($user in $Users) {
+
+    $username = $User.username
+    $password = $User.password
+    $firstname = $User.firstname
+    $lastname = $User.lastname
+    $OU = $User.ou
+    $email = $User.email
+
+    # Sprawdzenie czy użytkownik istnieje
+    if (Get-ADUser -F { SamAccountName -eq $username }) {
+        
+        # Jezeli istnieje to dajemy komentarz
+        Write-Warning "użtykownik z taką nazwa $username juz istnieje w ActiveDirectory."
+    }
+    else {
+
+        # Jezeli użytkownik nie istnieje to go towrzymy 
+        New-ADUser `
+            -SamAccountName $username `
+            -UserPrincipalName "$username@$domainName+".local"" `
+            -Name "$firstname $lastname" `
+            -GivenName $firstname `
+            -Surname $lastname `
+            -Enabled $True `
+            -DisplayName "$lastname, $firstname" `
+            -Path $OU `
+            -EmailAddress $email `
+            -Department $department `
+            -AccountPassword (ConvertTo-secureString $password -AsPlainText -Force) -ChangePasswordAtLogon $True
+
+        # If user is created, show message.
+        Write-Host "The user account $username is created." -ForegroundColor Cyan
+    }
+}
 
 }
 #Tworzenie użytkowników na serwerze koniec
